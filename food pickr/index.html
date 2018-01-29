@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.css" />
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap-theme.css" />
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+  <link type="text/css" rel="stylesheet" href="css/index.css" />
+  <script type="text/javascript" src="scripts/index.js"></script>
+
+  <title>Food Pickr</title>
+
+</head>
+<body>
+
+  <h1 id="name">Food Pickr</h1>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+  <div id="input">
+
+    Location: <input id ="location" placeholder="zip, address, etc."> </input>
+<!--    <br/>-->
+    <button id="search">Pick for me!</button>
+<!--    <br/>-->
+
+  </div>
+            
+        
+    <div id="results">
+  <h1 id="Name"></h1>
+            </div>
+  <li id="Address"></li>
+  <li id="City"></li>
+  <li id="state"></li>
+  <li id="Zipcode"></li>
+  <li id="Phone"></li>
+  <li id="Price"></li>
+  <li id="Category"></li>
+  <li><strong id="link"></strong><a id="url"></a></li>
+            <div id="results">
+  <li id="Key phrases from reviews"></li>
+  <li id="Sentiment score of reviews"></li>
+            </div>
+  <span id="info"></span>
+<!--            <br/>-->
+  <button id="search2">Next</button>
+<!--            <br/>-->
+    </div>
+        <div class="col">
+  <div id="map"></div>
+        </div>
+         </div>
+
+    </div>
+    
+  <script>
+  
+	function initMap(){
+	
+	var options = {
+        zoom:13,
+        center:{lat:30.6280,lng:-96.3344} //College Station lat lng
+      }
+      // New map
+      var map = new google.maps.Map(document.getElementById('map'), options);
+	
+
+      var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+      function addMarker(props){
+        var marker = new google.maps.Marker({
+            position:props.coords,
+            map:map,
+            icon:image
+        });
+        var textinmap = '<h1>' + props.name + '</h1>' + '<h3>' + props.location + '</h3>';
+        var infoWindow = new google.maps.InfoWindow({
+          content:textinmap
+        });
+        marker.addListener('click', function(){
+           infoWindow.open(map, marker);
+        });
+		map.setCenter(props.coords);
+      }
+	
+    //CORS proxy hosted on heroku
+    var cors_anywhere_url = 'https://ancient-badlands-46876.herokuapp.com/';
+    var yelp_search_url = cors_anywhere_url + "https://api.yelp.com/v3/businesses/search?location=LOCATION";
+    var btn = document.getElementById('search');
+	var btnnext = document.getElementById('search2');
+	var count=0;
+	var old_search="";
+	var lngi=-96.3344;
+	var lati=30.628;
+	var addr="";
+	var service_name="";
+	
+    function yelpSearch() {
+      var location = document.getElementById("location").value;  // get this from user input
+	  if(location==old_search){
+		count++;
+	  }
+	  else {
+		count=0;
+	  }
+	  old_search=location;
+      var search_url = yelp_search_url.replace("LOCATION",location);
+      search(search_url,mycallbackfunc);
+    }
+    btn.addEventListener("click",function(){
+      yelpSearch();
+    });
+	
+	btnnext.addEventListener("click",function(){
+      yelpSearch();
+    });
+	
+	
+    function search(search_url,mycallbackfunc) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', search_url, true);
+      //access token
+      xhr.setRequestHeader("Authorization", "Bearer 2txk9LtZ782n2r4SUJ6Yd25anN-1R4dBH0yC83jPxRgdTqPxfZOb8r2yKPLjBDrRbBDYl1heTObWIaWPW3pCXy_8v_UhYBo1-cIefczderkTlwSBcMa7WGaHkT0oWnYx" ,"");
+        xhr.onreadystatechange = function() {
+         if (xhr.readyState == 4 && xhr.status == 200) {
+                 mycallbackfunc(xhr.responseText);
+               }
+        };
+      xhr.send();
+    }
+    function mycallbackfunc(info){
+  //    console.log(info);// do whatever you want with your info in the browser here
+	  if(count>(JSON.parse(info).businesses.length-1)){
+		count=0;
+	  }
+      var obj = JSON.parse(info).businesses[count];
+	  document.getElementById('Name').innerHTML=obj.name;
+	  service_name=obj.name;
+	  var c=document.getElementById("City");	  
+      c.innerHTML="City: ";
+	  c.innerHTML=c.innerHTML.concat(obj.location.city);
+	  
+	  var ad=document.getElementById("Address");	  
+      ad.innerHTML="Address: ";
+	  ad.innerHTML=ad.innerHTML.concat(obj.location.address1," ",obj.location.address2," ",obj.location.address3);
+	  addr=ad.innerHTML;
+	  
+	  var st=document.getElementById("state");	  
+      st.innerHTML="State: ";
+	  st.innerHTML=st.innerHTML.concat(obj.location.state);
+	  
+	  var zip=document.getElementById("Zipcode");	  
+      zip.innerHTML="Zipcode: ";
+	  zip.innerHTML=zip.innerHTML.concat(obj.location.zip_code);
+	  
+	  var ph=document.getElementById("Phone");	  
+      ph.innerHTML="Phone: ";
+	  ph.innerHTML=ph.innerHTML.concat(obj.display_phone);
+	  
+	  var pr=document.getElementById("Price");	  
+      pr.innerHTML="Price: ";
+	  pr.innerHTML=pr.innerHTML.concat(obj.price);
+	  
+	  var ca=document.getElementById("Category");	  
+      ca.innerHTML="Category: ";
+	  ca.innerHTML=ca.innerHTML.concat(obj.categories[0].title);
+	  
+	  document.getElementById("link").innerHTML="Yelp link: ";
+	  var ulr=document.getElementById("url");	
+      ulr.href=obj.url;
+	  ulr.innerHTML=obj.name;
+	  
+	  lati=obj.coordinates.latitude;
+	  lngi=obj.coordinates.longitude;
+	  
+	  addMarker({
+			coords: {lat:lati,lng:lngi},
+			name: service_name,
+			location: addr
+			
+		  });
+	  
+	  
+	  var id=obj.id;
+	  var yelp_review_search_url = cors_anywhere_url + "https://api.yelp.com/v3/businesses/BUISNESS_ID/reviews";
+	  var search_url2 = yelp_review_search_url.replace("BUISNESS_ID",id);
+	  var xhr2 = new XMLHttpRequest();
+      xhr2.open('GET', search_url2, true);
+	  xhr2.setRequestHeader("Authorization", "Bearer 2txk9LtZ782n2r4SUJ6Yd25anN-1R4dBH0yC83jPxRgdTqPxfZOb8r2yKPLjBDrRbBDYl1heTObWIaWPW3pCXy_8v_UhYBo1-cIefczderkTlwSBcMa7WGaHkT0oWnYx" ,"");
+        xhr2.onreadystatechange = function() {
+         if (xhr2.readyState == 4 && xhr2.status == 200) {
+				 var rew=JSON.parse(xhr2.responseText).reviews;
+				 var txt=rew[0].text;
+				 txt=txt.concat(rew[1].text,rew[2].text);
+//				 document.getElementById("info").innerHTML=xhr2.responseText;
+				 sentiment(txt);
+               }
+        };
+      xhr2.send();
+	}
+	  
+	  
+	  function sentiment(reviews){
+		const inputText = reviews;
+		const requestBody = {
+		  "documents": [
+			{
+			  "language": "en",
+			  "id": "1",
+			  "text": inputText,
+			}
+		  ]
+		};
+		
+		(requestBody => {
+		  const request = new XMLHttpRequest();
+		  request.open('POST', 'https://westcentralus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment', true);
+		  request.setRequestHeader("Content-Type", "application/json");
+		  request.setRequestHeader("Ocp-Apim-Subscription-Key", "8aa9bfcbe2b341c2b3f0399a3d95c74a"); // Set API key.
+		  request.setRequestHeader("Accept","application/json");
+		  request.onload = () => {
+			const senscore = document.getElementById('Sentiment score of reviews');
+			// Clear resultList field.
+			senscore.innerHTML = 'Sentiment score of reviews: ';
+			// Set response data.
+			JSON.parse(request.responseText).documents.forEach(result => {
+				var score=result.score*100;
+				senscore.innerHTML = senscore.innerHTML.concat(score.toFixed(2),"/100.00");
+			  
+			});
+		  };
+		  request.onerror = () => {
+			alert(request.responseText);
+		  };
+		  request.send(JSON.stringify(requestBody));
+		})(requestBody);
+		
+		(requestBody => {
+		  const request = new XMLHttpRequest();
+		  request.open('POST', 'https://westcentralus.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases', true);
+		  request.setRequestHeader("Content-Type", "application/json");
+		  request.setRequestHeader("Ocp-Apim-Subscription-Key", "8aa9bfcbe2b341c2b3f0399a3d95c74a"); // Set API key.
+		  request.setRequestHeader("Accept","application/json");
+		  request.onload = () => {
+			var resultList = document.getElementById('Key phrases from reviews');
+			// Clear resultList field.
+			resultList.innerHTML = 'Key phrases from reviews: ';
+			// Set response data.
+			const space = ', ';
+			var n=0;
+			JSON.parse(request.responseText).documents.forEach(result => {
+			  result.keyPhrases.forEach(phrase => {
+			    if(phrase.length>10&&n<6){
+					resultList.innerHTML=resultList.innerHTML.concat(phrase,space);
+					n++;
+				}
+				
+			  });
+			});
+			n=0;
+			resultList.innerHTML=resultList.innerHTML.substr(0,resultList.innerHTML.length-2);
+		  };
+		  request.onerror = () => {
+			alert(request.responseText);
+		  };
+		  request.send(JSON.stringify(requestBody));
+		})(requestBody);
+		
+		
+	  }
+	 }
+    
+    //prepQuery();
+  </script>
+
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDObakGKEnYC0ZmDPQcPsWpV_I3cAHtQvc&callback=initMap"async defer>
+  </script>
+  
+
+  
+
+
+
+</body>
+</html>

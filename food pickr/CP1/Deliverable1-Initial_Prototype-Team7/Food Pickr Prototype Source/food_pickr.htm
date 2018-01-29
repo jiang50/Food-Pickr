@@ -1,0 +1,76 @@
+<!DOCTPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Food Pickr</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+        }
+        .row {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+         .column {
+            float: left;
+            width: 300px;
+            padding: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .column {
+                width: 200%;
+            }
+        }
+        
+        .box {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+    
+<body>
+     <h1>Food Pickr</h1>
+    <div class="row">
+        <div class="column">
+            <h3>Inputs</h3>
+            <form>
+                Food Type: <input type="text" name="foodType"><br>
+                City: <input type="text" name="city"><br>
+                State: <input type="text" name="state"><br>
+                Zip Code: <input type="text" name="zipCode">
+                <br>
+                Radius (miles): <input type="text" name="radius">
+                <br>
+                Stars: <input type="text" name="stars"><br>
+                <input type="submit">
+            </form>
+        </div>
+        <div class="column">
+            <h3>Results</h3>
+            <div class="box">
+                Resaurant 1<br>
+                Restaurant 2<br>
+                Restaurant 3<br>
+            </div>
+            <br>
+            <form>
+            <button name="pickr" type="button" value="Pick for me!">Pick for me!</button>
+            </form>
+        </div>
+        <div class="column">
+            <h3>Map</h3>
+            <div class="box">
+                <img src="cstat_restaurants.JPG" alt="College Station Restaurants">
+            </div>
+        </div>      
+    </div>
+</body>  
+</html>

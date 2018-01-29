@@ -1,0 +1,32 @@
+#name {
+  font: normal 76px/1 "Aclonica", Helvetica, sans-serif;
+  color: crimson;
+  text-align: center;
+}
+#input {
+  height:50px;
+  width:50%;
+}
+#info {
+  height:500px;
+  width:0%;
+  float:left;
+}
+#search2 {
+    top:500px;
+    float:left; 
+}
+#map{
+  height:550px;
+  width:49%;
+top:-280px;
+    right:0px;
+  float:right;
+}
+#results {
+    width:50%;
+}
+
+body {
+    background-color:azure
+}
